@@ -1,0 +1,12 @@
+@keyframes h-0-org {
+    from {
+        height: 0px
+    }
+    to {
+        height: auto;
+    }
+}
+
+.h-0-org {
+    animation: h-0-org 0.5 ease forwards;
+}
