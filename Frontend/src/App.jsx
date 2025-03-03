@@ -25,7 +25,7 @@ function App() {
   const [uiColor, setUIColor] = useState('#00000030') // dynamic color
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/My-Portfolio">
       <Routes>
         {/* My portfolio */}
         <Route path='/' element={<Navigate to="/welcome"/>}></Route>
@@ -45,7 +45,7 @@ function App() {
         </Route>
 
         {/* Not Found Page */}
-        <Route path="*" element={<div className='text-4xl h-dvh flex items-center justify-center'>404 Page not found.... SUCKER!!!!</div>}></Route>
+        <Route path="*" element={<div className='text-4xl h-dvh flex items-center justify-center' style={{backgroundColor: uiColor}} ><div className="bg-white p-10 rounded-4xl">404 Page not Found!!!!</div></div>}></Route>
       </Routes>
     </BrowserRouter>
   )

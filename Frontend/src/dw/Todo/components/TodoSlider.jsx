@@ -48,14 +48,14 @@ export const TodoSlider = ({ setUIColor, setDelAllPopup, setNameEditPopup, isLog
 function LROption() {
   return (<div>
     <span className="text-red-500 text-lg font-bold">Note:-</span>
-    <span className='cursor-default' id='testaccount'>Please <a  href='/login' className='underline hover:text-violet-500 active:text-red-500 '>login</a> to save your data.</span>
-    <div className='cursor-default' id='testaccount'>New ? Consider <a  href='/register' className='underline hover:text-violet-500 active:text-red-500 '> Signing Up! </a></div>
-    <div className='cursor-default'><a  href='/welcome' className='underline hover:text-violet-500 active:text-red-500 '>My Portfolio</a></div>
+    <span className='cursor-default' id='testaccount'>Please <Link to='/login' className='underline hover:text-violet-500 active:text-red-500 '>login</Link> to save your data.</span>
+    <div className='cursor-default' id='testaccount'>New ? Consider <Link to='/register' className='underline hover:text-violet-500 active:text-red-500 '> Signing Up! </Link></div>
+    <div className='cursor-default'><Link to='/welcome' className='underline hover:text-violet-500 active:text-red-500 '>My Portfolio</Link></div>
   </div>)
 }
 function LogOutOption({setIsLogIn}) {
   return (<div className=''>
-    <div className='cursor-default' id='testaccount' onClick={()=>{setIsLogIn(false)}}><a  href='/todo' className='underline hover:text-violet-500 active:text-red-500 '> Logout !!! </a></div>
+    <div className='cursor-default' id='testaccount' onClick={()=>{setIsLogIn(false)}}><Link to='/todo' className='underline hover:text-violet-500 active:text-red-500 '> Logout !!! </Link></div>
     <div className='cursor-default'><Link  to='/welcome' className='underline hover:text-violet-500 active:text-red-500 '>My Portfolio</Link></div>
   </div>)
 }
