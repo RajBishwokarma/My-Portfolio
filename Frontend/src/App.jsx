@@ -22,7 +22,7 @@ function App() {
   const [isLogIn, setIsLogIn] = useState(false)       // login
   const [userName, setUserName] = useState('Guest')   // username
   const [userEmail, setUserEmail] = useState('0')     // user email
-  const [uiColor, setUIColor] = useState('#00000030') // dynamic color
+  const [uiColor, setUIColor] = useState('#00000030') // Ui color
 
   return (
     <BrowserRouter basename="/My-Portfolio">

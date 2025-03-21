@@ -43,7 +43,7 @@ export const loginLogic = async(event, navigate, setIsLogIn, setUserName, setUse
                 lEmail: lEmail.value
             }
             // requesting Call
-            const lLogin = await axios.post('http://localhost:3000/api/user/login', pData)
+            const lLogin = await axios.post('http://my-portfolio-b9tc.onrender.com/api/user/login', pData)
             alert(lLogin.data.msg)
             if (lLogin.data.passwordIs) {
                 setIsLogIn(true)

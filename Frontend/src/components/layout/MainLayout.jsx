@@ -24,7 +24,7 @@ export default function MainLayout({ uiColor }) {
                 <div className="">My Contact Info</div>
                 <div className="flex justify-around">
                 <div className="flex flex-col  items-start">
-                    <div className="">Email: <a href="mailto:rajbishwakarma@gmail.com">rajbishwakarma@gmail.com</a></div>
+                    <div className="">Email: <a href="mailto:rajaryanbishwokarma@gmail.com">rajaryanbishwokarma@gmail.com</a></div>
                     <div className="">phone no: +977 9708885807</div>
                 </div>
                 <div className="flex flex-col items-start">
