@@ -15,10 +15,11 @@ export const AddTaskBar = (props) => {
   
 
   return (
-    <div className='bg-white text-3xl w-3/5 p-1 flex rounded-full inset-shadow-2xs shadow-2xl'>
-      <input type="text" id='addTaskIn' className="bg-transparent w-full pl-6 pr-2 outline-none" placeholder='Type Your Task Here,'
+    <div className='bg-white text-3xl w-3/5 p-1 pl-5 flex items-center rounded-full inset-shadow-2xs shadow-2xl  
+          max-[400px]:p-0 max-[400px]:pl-3 max-[400px]:text-lg  max-[400px]:w-[80%]'>
+      <input type="text" id='addTaskIn' className="bg-transparent w-full pl-1 pr-2 outline-none  max-[350px]:pl-4" placeholder='Type Your Task Here,'
               value={taskInData}  onChange={handleInputChange} onKeyDown={handleEnterKey}/>
-      <div className="w-16 h-fit flex items-center justify-center">
+      <div className="w-16 h-fit flex items-center justify-center  max-[400px]:w-10">
         <BtnModel imgsrc={svg.rightArrow} logic={handleAddBtn}></BtnModel>
       </div>
     </div>

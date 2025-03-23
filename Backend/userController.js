@@ -77,6 +77,7 @@ export const getUser = async (req, res) => {
         res.status(500).json({msg:'Server Error'})
     }
 }
+// Rename
 export const changeName = async(req,res)=>{
     try {
         getFullUrl(req);
@@ -88,13 +89,12 @@ export const changeName = async(req,res)=>{
             res.status(200).json({ msg: `Didn't find anyone with this email: `, nameChanged: false, updateUN })
             return;
         }
-        res.status(200).json({ msg: `Username Updated to ${newUsername}: `, nameChanged: true, updateUN }) 
+        res.status(200).json({ msg: `Username Updated to: ${newUsername}.`, nameChanged: true }) 
     } catch (error) {
         console.error(error); // Log the error for debugging
         res.status(500).json({msg:'Server Error'})
     }
 }
-
 
 // todo user Data
 
@@ -107,7 +107,7 @@ export const getUserTask = async (req,res)=>{
         res.status(200).json({msg: 'Task', getData})
     } catch (error) {
         console.error(error); // Log the error for debugging
-        res.status(200).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg:'Server Error'}); // Handle server errors
     }
 }
 export const getUserAllTask = async (req,res)=>{
@@ -126,7 +126,7 @@ export const getUserAllTask = async (req,res)=>{
         }
     } catch (error) {
         console.error(error); // Log the error for debugging
-        res.status(200).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg:'Server Error'}); // Handle server errors
     }
 }
 export const createNewTask = async (req,res)=>{
@@ -144,7 +144,7 @@ export const createNewTask = async (req,res)=>{
         res.status(201).json({msg: 'Task Created',uploadData})
     } catch (error) {
         console.error(error); // Log the error for debugging
-        res.status(200).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg:'Server Error'}); // Handle server errors
     }
 }
 export const updateTaskState =  async (req, res) => {
@@ -165,7 +165,7 @@ export const updateTaskState =  async (req, res) => {
         res.status(200).json({ msg: 'Task Updated', updateData })
     } catch (error) {
         console.error(error)  // Use `error` instead of `err`
-        res.status(200).json({ msg: 'Server Error', error: error.message })  // Use `error.message` instead of `err.message`
+        res.status(500).json({ msg: 'Server Error', error: error.message })  // Use `error.message` instead of `err.message`
     }
 }
 export const delUserTask = async (req,res)=>{
@@ -180,7 +180,7 @@ export const delUserTask = async (req,res)=>{
         res.status(201).json({msg: `Task: ${req.body.taskDate} has been deleted`, delTask})
     } catch (error) {
         console.error(error); // Log the error for debugging
-        res.status(200).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg:'Server Error'}); // Handle server errors
     }
 }
 export const delUserAllTask = async (req,res)=>{
@@ -194,6 +194,6 @@ export const delUserAllTask = async (req,res)=>{
         res.status(201).json({msg: 'All task has been Deleted', updateData})
     } catch (error) {
         console.error(error); // Log the error for debugging
-        res.status(200).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg:'Server Error'}); // Handle server errors
     }
 }

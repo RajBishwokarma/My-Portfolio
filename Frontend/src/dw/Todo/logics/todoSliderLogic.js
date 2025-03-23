@@ -20,16 +20,15 @@ export const logicNameEditBtn = async (newName, setNewName, setNameEditPopup, se
     return
   }
   if (isLogIn) {
-    const reqChangeName = await axios.patch('http://localhost:3000/api/user/changename', { email: userEmail, newUsername: normalName})  
+    const reqChangeName = await axios.patch('https://my-portfolio-b9tc.onrender.com/api/user/changename', { email: userEmail, newUsername: normalName})  
     if ( !reqChangeName.data.nameChanged ) {
       console.log("Can't Change name because reqChangeName.data.nameChanged: ", reqChangeName.data.nameChanged );
       return
     } else {
-      console.log('reqChangeName: ',reqChangeName.data);
+      console.log(reqChangeName.data.msg);
       
     }
   }
-  console.log(normalName);
   setUserName(normalName)
   setNewName('')
   return

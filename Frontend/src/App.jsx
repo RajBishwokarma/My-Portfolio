@@ -21,26 +21,26 @@ function App() {
 
   const [isLogIn, setIsLogIn] = useState(false)       // login
   const [userName, setUserName] = useState('Guest')   // username
-  const [userEmail, setUserEmail] = useState('0')     // user email
+  const [userEmail, setUserEmail] = useState('')     // user email
   const [uiColor, setUIColor] = useState('#00000030') // Ui color
+  const [loading, setLoading] = useState(false) // Render pop up while requesting
 
   return (
     <BrowserRouter basename="/My-Portfolio">
       <Routes>
         {/* My portfolio */}
         <Route path='/' element={<Navigate to="/welcome"/>}></Route>
-        <Route element={<MainLayout uiColor={uiColor} setUIColor={setUIColor} />}>
-          <Route path="/welcome" element={<Welcome/>}></Route>
-          <Route path="/aboutme" element={<AboutMe/>}></Route>
-          <Route path="/works" element={<Works/>}></Route>
-          <Route path='/login' element={<Login isLogIn={isLogIn} setIsLogIn={setIsLogIn} setUserName={setUserName} setUserEmail={setUserEmail} />} />
-          <Route path='/register' element={<Register/>} />
+        <Route element={<MainLayout uiColor={uiColor} setUIColor={setUIColor} loading={loading} />}>
+          <Route path="/welcome" element={<Welcome/>} />
+          <Route path="/aboutme" element={<AboutMe/>} />
+          <Route path="/works" element={<Works isLogIn={isLogIn} setIsLogIn={setIsLogIn} setUserName={setUserName} setUserEmail={setUserEmail} />} />
+          {/* Login N Register */}
+          <Route path='/login' element={<Login isLogIn={isLogIn} setIsLogIn={setIsLogIn} setUserName={setUserName} setUserEmail={setUserEmail} setLoading={setLoading} />} />
+          <Route path='/register' element={<Register setLoading={setLoading} />}/>
         </Route>
 
-        {/* Login N Register */}
-
         {/* Todo App */}
-        <Route path='/todo' element={<TodoLayout userEmail={userEmail} isLogIn={isLogIn} userName={userName} uiColor={uiColor} setUserName={setUserName} setUIColor={setUIColor} />}>
+        <Route path='/todo' element={<TodoLayout isLogIn={isLogIn} userName={userName} userEmail={userEmail} setIsLogIn={setIsLogIn} setUserName={setUserName} setUserEmail={setUserEmail} setUIColor={setUIColor} uiColor={uiColor} />}>
           <Route index element={<TodoHome isLogIn={isLogIn} userEmail={userEmail} />} />
         </Route>
 
@@ -51,5 +51,5 @@ function App() {
   )
 }
 
-
 export default App
+

@@ -8,7 +8,7 @@ export const addTaskLogic = async ( isLogIn, userEmail, taskInData, setTaskInDat
     
     const dateNow = Date.now()
     if (isLogIn) {
-        await axios.post('http://localhost:3000/api/todo/user/newtask', { email: userEmail, taskName: taskName, taskDate: dateNow })
+        await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/newtask', { email: userEmail, taskName: taskName, taskDate: dateNow })
     }
     setTodoData( p => [...p, { taskName: taskName, isComplete: false, taskDate: dateNow }])
     return;
@@ -17,7 +17,7 @@ export const addTaskLogic = async ( isLogIn, userEmail, taskInData, setTaskInDat
 export const logicIsComplete = async (taskIndex, isComplete, taskDate, setTodoData, isLogIn, userEmail) => {
     
     if (isLogIn) {
-        await axios.patch('http://localhost:3000/api/todo/user/uts', { email: userEmail, taskDate, isComplete })
+        await axios.patch('https://my-portfolio-b9tc.onrender.com/api/todo/user/uts', { email: userEmail, taskDate, isComplete })
     }
     setTodoData((pre)=>{
         const newData = [...pre]
@@ -32,7 +32,7 @@ export const logicIsComplete = async (taskIndex, isComplete, taskDate, setTodoDa
 export const logicDelTask = async (taskIndex, taskDate, setTodoData, todoData, isLogIn, userEmail) => {
     
     if (isLogIn) {    
-        await axios.post('http://localhost:3000/api/todo/user/deltask', { email: userEmail, taskDate, _method: 'delete' })
+        await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/deltask', { email: userEmail, taskDate, _method: 'delete' })
     }
     const newData = todoData.filter( (e,i) => i !== taskIndex )
     setTodoData(newData)
@@ -48,7 +48,7 @@ export const logicDelAllTask = async ( setIsPopup, todoData, setTodoData, isLogI
     setTodoData([]) 
     if (isLogIn) {
         try { 
-            await axios.post('http://localhost:3000/api/todo/user/delalltask', { email: userEmail })
+            await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/delalltask', { email: userEmail })
         } catch (error) {
             console.error('Error deleting tasks:', error);
         }

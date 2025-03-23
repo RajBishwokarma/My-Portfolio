@@ -5,8 +5,8 @@ const rUsersSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        minlength: 3, // Minimum length of 3 characters
-        maxlength: 20 // Maximum length of 20 characters
+        minlength: 2,
+        maxlength: 16
     },
     password: {
         type: String,
@@ -15,8 +15,8 @@ const rUsersSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        minlength: 5, // Minimum length of 5 characters
-        maxlength: 50 // Maximum length of 50 characters
+        minlength: 5,
+        maxlength: 50
     },
 
 });

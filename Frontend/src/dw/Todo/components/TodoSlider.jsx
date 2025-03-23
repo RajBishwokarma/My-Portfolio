@@ -4,11 +4,15 @@ import { todoSL } from '../logics/TodoSliderLogic'
 import { BtnModel } from '../../../components/btn/BtnModel'
 import { svg } from '../../../assets/svgs'
 import { Link } from 'react-router-dom'
+import { logoutLogic } from '../../../logics/rlLogic'
 
-export const TodoSlider = ({ setUIColor, setDelAllPopup, setNameEditPopup, isLogIn, setIsLogIn, userName }) => {
+export const TodoSlider = ({ setUIColor, setDelAllPopup, setNameEditPopup, isLogIn, setIsLogIn, userName, setUserName, setUserEmail }) => {
   
   const UIColorLogic = (event) => { // UI Color Updater
     setUIColor(event.target.value)
+  }
+  const handleLogout = () => { // Handles Logout
+    logoutLogic(setIsLogIn, setUserName, setUserEmail)
   }
   
   return (
@@ -18,7 +22,7 @@ export const TodoSlider = ({ setUIColor, setDelAllPopup, setNameEditPopup, isLog
         style={{minWidth: '200px', width: '30%'}}>
         {/* Greet User */}
         <div className="text-xl bg-amber-2001 flex items-center flex-wrap break-words" id='slidermain'>
-          Welcome,
+          <Link to='/welcome' className='underline hover:text-violet-500 active:text-red-500 '>Welcome,</Link>
           <span className='pl-2'>
             {userName}
           </span>
@@ -38,7 +42,7 @@ export const TodoSlider = ({ setUIColor, setDelAllPopup, setNameEditPopup, isLog
         <div className="text-red-500 text-lg font-bold cursor-pointer hover:text-black active:text-white" onClick={()=>{setDelAllPopup(true)}}>Delete All Task !!!</div>
         {/* <LogOption /> */}
         <div className="flex-grow flex items-end"> 
-          {isLogIn ? <LogOutOption setIsLogIn={setIsLogIn} /> : <LROption />}
+          {isLogIn ? <LogOutOption handleLogout={handleLogout} /> : <LROption />}
         </div>
     </div>
   )
@@ -50,13 +54,11 @@ function LROption() {
     <span className="text-red-500 text-lg font-bold">Note:-</span>
     <span className='cursor-default' id='testaccount'>Please <Link to='/login' className='underline hover:text-violet-500 active:text-red-500 '>login</Link> to save your data.</span>
     <div className='cursor-default' id='testaccount'>New ? Consider <Link to='/register' className='underline hover:text-violet-500 active:text-red-500 '> Signing Up! </Link></div>
-    <div className='cursor-default'><Link to='/welcome' className='underline hover:text-violet-500 active:text-red-500 '>My Portfolio</Link></div>
   </div>)
 }
-function LogOutOption({setIsLogIn}) {
+function LogOutOption({handleLogout}) {
   return (<div className=''>
-    <div className='cursor-default' id='testaccount' onClick={()=>{setIsLogIn(false)}}><Link to='/todo' className='underline hover:text-violet-500 active:text-red-500 '> Logout !!! </Link></div>
-    <div className='cursor-default'><Link  to='/welcome' className='underline hover:text-violet-500 active:text-red-500 '>My Portfolio</Link></div>
+    <div className='cursor-default' id='testaccount' onClick={handleLogout}><Link to='/todo' className='underline hover:text-violet-500 active:text-red-500 '> Logout !!! </Link></div>
   </div>)
 }
 

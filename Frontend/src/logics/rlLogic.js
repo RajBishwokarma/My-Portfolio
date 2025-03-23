@@ -2,8 +2,9 @@
 import axios from 'axios'
 
 // Sign Up
-export const registerLogic = async(event,navigate) => {
+export const registerLogic = async(event,navigate,setLoading) => {
     event.preventDefault()
+    setLoading(true)
     try {
         const rUsername = document.getElementById('rUsername')
         const rPassword = document.getElementById('rPassword')
@@ -12,6 +13,7 @@ export const registerLogic = async(event,navigate) => {
         if (rUsername && rPassword && rEmail) { //checking the data
 
             if (rUsername.value.endsWith(' ') || rPassword.value.endsWith(' ') || rEmail.value.endsWith(' ')) {
+                setLoading(false)
                 alert('No space allowed at the end of the inputs!')
                 return;
             }
@@ -21,18 +23,21 @@ export const registerLogic = async(event,navigate) => {
                 rEmail: rEmail.value
             }
             // requesting Call
-            const resNewUser = await axios.post('http://localhost:3000/api/user/register', pData)
+            const resNewUser = await axios.post('https://my-portfolio-b9tc.onrender.com/api/user/register', pData)
             alert(resNewUser.data.msg)
             navigate('/login')
         }
+        setLoading(false)
     } catch (error) {
+        setLoading(false)
         console.log('Error while creating New Account: ',error)
         alert(error.response.data.msg)
     }
 }
 // login
-export const loginLogic = async(event, navigate, setIsLogIn, setUserName, setUserEmail) => {
+export const loginLogic = async(event, navigate, setIsLogIn, setUserName, setUserEmail, setLoading) => {
     event.preventDefault()
+    setLoading(true)
     try {
         const lPassword = document.getElementById('lPassword')
         const lEmail = document.getElementById('lEmail')
@@ -43,7 +48,8 @@ export const loginLogic = async(event, navigate, setIsLogIn, setUserName, setUse
                 lEmail: lEmail.value
             }
             // requesting Call
-            const lLogin = await axios.post('http://my-portfolio-b9tc.onrender.com/api/user/login', pData)
+            const lLogin = await axios.post('https://my-portfolio-b9tc.onrender.com/api/user/login', pData)
+            setLoading(false)
             alert(lLogin.data.msg)
             if (lLogin.data.passwordIs) {
                 setIsLogIn(true)
@@ -51,10 +57,20 @@ export const loginLogic = async(event, navigate, setIsLogIn, setUserName, setUse
                 setUserEmail(lLogin.data.email)
                 return navigate('/todo')
             }
+        } else {
+            setLoading(false)
+            alert('Error while processing data. Please check your email and password.')
         }
     } catch (error) {
+        setLoading(false)
         alert(error.response.data.msg)
     }
+}
+// Logout
+export const logoutLogic = (setIsLogIn, setUserName, setUserEmail) => {
+    setIsLogIn(false)
+    setUserName('Guest')
+    setUserEmail('')
 }
   
   

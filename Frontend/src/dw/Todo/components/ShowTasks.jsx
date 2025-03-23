@@ -28,7 +28,8 @@ export const ShowTasks = (props) => {
 function NoTaskBanner() {
   return(
     <div className="h-full p-10 flex justify-center items-center">
-      <span className="text-5xl font-mono font-bold text-center py-7 px-10 rounded-2xl shadow-2xl" >There are no any Task...</span>
+      <span className="text-4xl font-mono font-bold text-center py-7 px-10 rounded-2xl shadow-2xl
+            max-[480px]:text-3xl1 max-[400px]:text-xl" >There are no any Task...</span>
     </div>
   )
 }
