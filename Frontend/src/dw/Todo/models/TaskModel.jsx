@@ -8,9 +8,9 @@ export const TaskModel = (props) => {
 
   const { taskIndex, task, todoData, setTodoData, isLogIn, userEmail } = props
 
-  const { taskName, isComplete, taskDate } = task
+  const { taskText, isComplete, taskDate } = task
 
-  const completeTaskttl = isComplete?<del>{taskName}</del>:taskName
+  const completeTaskttl = isComplete?<del>{taskText}</del>:taskText
   const imgsrcIsComplete = isComplete?svg.tickSquare:svg.boxSquare
 
   const handleIsCompleteBtn = () => logicIsComplete( taskIndex, isComplete, taskDate, setTodoData, isLogIn, userEmail)

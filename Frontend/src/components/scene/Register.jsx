@@ -15,7 +15,7 @@ const Register = ({setLoading}) => {
       <form className='bg-white flex flex-col gap-y-3 p-5 shadow-2xl rounded-2xl
             max-[400px]:p-0 max-[400px]:shadow-none '
           onSubmit={(event)=>registerLogic(event, navigate, setLoading)}>
-        <LGInput id='rUsername' type='text' placeHolder='Username' min={2} max={20}  ></LGInput>
+        <LGInput id='rUsername' type='text' placeHolder='Username' min={2} max={16}  ></LGInput>
         <LGInput id='rPassword' type='password' placeHolder='Password' min={6} max={50}></LGInput>
         <LGInput id='rEmail' type='email'  placeHolder='Email' min={6} max={50}></LGInput>
         <LoginRegisterBtn buttonttl='Register' ></LoginRegisterBtn>

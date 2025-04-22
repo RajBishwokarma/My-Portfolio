@@ -1,10 +1,10 @@
 import express from 'express'
 import cors from 'cors'
-import mongoose from 'mongoose'
-import dotenv from 'dotenv'
+import dotenv, { config } from 'dotenv'
 dotenv.config() // Load environment variable
 
 import { todoRoute, userRoutes } from './routes.js'
+import db from './firebase.js';
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -22,14 +22,9 @@ app.get('/', (req, res) => { // its just testing
 app.use('/api/user/', userRoutes)
 app.use('/api/todo/user/', todoRoute)
 
-// DB Connection and Server Start
-app.listen(PORT, async () => {
-  try {
-    await mongoose.connect(process.env.DB_Web)
-      .then(() => console.log('web db is connected..'))
-      
-    console.log(`We are running at port ${PORT}...`)
-  } catch (error) {
-    console.log(error)
-  }
+app.get('*', (req, res) => { // its just testing
+  return res.status(404).send('404 page not found')
 })
+
+// Server Start
+app.listen(PORT, () => console.log(`We are running at port ${PORT}...`))

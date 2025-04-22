@@ -15,19 +15,23 @@ export default function TodoLayout(props) {
     const [delAllPopup, setDelAllPopup] = useState(false) // Delete Popup
     const [nameEditPopup, setNameEditPopup] = useState(false) // Name Change Popup
 
-    useEffect(() => {
-        if (isLogIn) {
-            (async() => {
-                const getAllTask = await axios.get(`https://my-portfolio-b9tc.onrender.com/api/todo/user/getAllTask?email=${userEmail}`)
-                if (getAllTask.data.getData) { 
-                    setTodoData(getAllTask.data.getData)
-                } else {
-                    setTodoData([])
-                }
-            })()
-        }else {
-            setTodoData([])
+    const retriveTodoData = async() => {
+        try {
+            // const getAllTask = await axios.get(`https://my-portfolio-b9tc.onrender.com/api/todo/user/getAllTask?email=${userEmail}`)
+            const getAllTask = await axios.post(`https://my-portfolio-b9tc.onrender.com/api/todo/user/getAllTask`, {
+                _Route: "retrive Todo Data",
+                reqData: {userEmail}
+            })
+            setTodoData(getAllTask.data._TodoApp)
+        } catch (error) {
+            alert(error.response.data.msg);
         }
+    }
+    useEffect(() => {
+        if (!isLogIn) {
+            return setTodoData([])
+        }
+        retriveTodoData()
     }, [isLogIn])
     
 
@@ -60,7 +64,7 @@ const NameEditPopup = (props) =>{
         <div id='alldelpopup' className="z-50 fixed text-white flex justify-center items-center w-full h-dvh">
             <div className=' bg-[#00000080] backdrop-blur-lg text-3xl text-center font-bold w-fit p-5 border-2 border-black rounded-2xl max-[400px]:p-2 '>
                 <div className=' text-red-6001 underline p-3'>
-                    <input type="text" value={newName} placeholder='min 2 letters, max 16' minLength={3} maxLength={16}
+                    <input type="text" value={newName} placeholder='min 2 letters, max 16' minLength={2} maxLength={16}
                         className=" px-7 py-1 mb-5 rounded-4xl border-2 border-black 
                             max-[600px]:text-xl max-[400px]:text-sm max-[400px]:px-4 " 
                         onChange={e=>setNewName(e.target.value)}

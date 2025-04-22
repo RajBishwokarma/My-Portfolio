@@ -8,9 +8,10 @@ export const AddTaskBar = (props) => {
   const { isLogIn, userEmail, setTodoData } = props
   
   const [taskInData, setTaskInData] = useState('')
+  const [addTaskState, setAddTaskState] = useState(true) // limit Add task
   
   const handleInputChange = e => setTaskInData( e.target.value )
-  const handleAddBtn = () => addTaskLogic( isLogIn, userEmail, taskInData, setTaskInData, setTodoData )
+  const handleAddBtn = () => addTaskLogic( isLogIn, userEmail, setTodoData, taskInData, setTaskInData, addTaskState, setAddTaskState )
   const handleEnterKey = e => (e.key === 'Enter') && handleAddBtn()
   
 

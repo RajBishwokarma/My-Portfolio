@@ -1,24 +1,29 @@
 import axios from "axios";
 
 
-export const addTaskLogic = async ( isLogIn, userEmail, taskInData, setTaskInData, setTodoData ) => {
+export const addTaskLogic = async ( isLogIn, userEmail, setTodoData, taskInData, setTaskInData, addTaskState, setAddTaskState ) => {
     if (!taskInData) return;
-    const taskName = taskInData
+    if (!addTaskState) return;
+    setAddTaskState(false)
+    const taskText = taskInData
     setTaskInData('')
-    
-    const dateNow = Date.now()
+    const taskDate = Date.now()
     if (isLogIn) {
-        await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/newtask', { email: userEmail, taskName: taskName, taskDate: dateNow })
+        try {
+            const pData = { userEmail, taskText, taskDate } // Preparing Data       
+            await axios.post("https://my-portfolio-b9tc.onrender.com/api/todo/user/newtask", { _Route: "Add task", reqData: pData })
+        } catch (error) {
+            setAddTaskState(true)
+            return alert("error while adding task: "+ error.response.data.msg)
+        }
     }
-    setTodoData( p => [...p, { taskName: taskName, isComplete: false, taskDate: dateNow }])
+    const aData = { taskText, isComplete: false, taskDate } // adding Data
+    setTodoData( p => [...p, aData])
+    setAddTaskState(true)
     return;
 }
 
 export const logicIsComplete = async (taskIndex, isComplete, taskDate, setTodoData, isLogIn, userEmail) => {
-    
-    if (isLogIn) {
-        await axios.patch('https://my-portfolio-b9tc.onrender.com/api/todo/user/uts', { email: userEmail, taskDate, isComplete })
-    }
     setTodoData((pre)=>{
         const newData = [...pre]
         newData[taskIndex] = {
@@ -27,16 +32,27 @@ export const logicIsComplete = async (taskIndex, isComplete, taskDate, setTodoDa
         } 
         return newData
     })
+    if (!isLogIn) return;
+    const pData = { userEmail, taskDate, isComplete } // Preparing Data
+    try {   
+        await axios.patch("https://my-portfolio-b9tc.onrender.com/api/todo/user/uts", { _Route: "Update task stats", reqData: pData })
+    } catch (error) {
+        return alert("error while updating task: "+ error.response.data.msg)
+    }
+    return;
 }
 
 export const logicDelTask = async (taskIndex, taskDate, setTodoData, todoData, isLogIn, userEmail) => {
     
-    if (isLogIn) {    
-        await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/deltask', { email: userEmail, taskDate, _method: 'delete' })
-    }
     const newData = todoData.filter( (e,i) => i !== taskIndex )
     setTodoData(newData)
-    return;
+    if (!isLogIn) return;
+    const pData = { userEmail, taskDate } // Preparing Data
+    try {    
+        await axios.post("https://my-portfolio-b9tc.onrender.com/api/todo/user/deltask", { _Route: "Delete task", reqData: pData })
+    } catch (error) {
+        return alert("error while deleting task: "+ error.response.data.msg)
+    }
 }
 
 export const logicDelAllTask = async ( setIsPopup, todoData, setTodoData, isLogIn, userEmail ) => {
@@ -46,11 +62,11 @@ export const logicDelAllTask = async ( setIsPopup, todoData, setTodoData, isLogI
         return
     }
     setTodoData([]) 
-    if (isLogIn) {
-        try { 
-            await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/delalltask', { email: userEmail })
-        } catch (error) {
-            console.error('Error deleting tasks:', error);
-        }
+    if (!isLogIn) return
+    try { 
+        await axios.post('https://my-portfolio-b9tc.onrender.com/api/todo/user/delalltask', { _Route: "Almighty Delete!!!", reqData:{userEmail} })
+            .then( res => alert(res.data.msg))
+    } catch (error) {
+        alert('Almighty Delete, Failed!!!:'+ error.response.data.msg)
     }
 }

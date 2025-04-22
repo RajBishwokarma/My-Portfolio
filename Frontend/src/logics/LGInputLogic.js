@@ -9,6 +9,6 @@ export const LGInputLogic = (id) => {
             element.value = trimmedValue; // Update the input value if it changed
         }
     } else {
-        console.log(`Wait sucker, ${id} is loading...`);
+        alert(`Wait Sir, ${id} is loading...`);
     }
 };

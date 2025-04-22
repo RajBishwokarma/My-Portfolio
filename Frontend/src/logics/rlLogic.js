@@ -10,61 +10,57 @@ export const registerLogic = async(event,navigate,setLoading) => {
         const rPassword = document.getElementById('rPassword')
         const rEmail = document.getElementById('rEmail')
     
-        if (rUsername && rPassword && rEmail) { //checking the data
-
-            if (rUsername.value.endsWith(' ') || rPassword.value.endsWith(' ') || rEmail.value.endsWith(' ')) {
-                setLoading(false)
-                alert('No space allowed at the end of the inputs!')
-                return;
-            }
-            const pData = { // pData = preparing data
-                rUsername: rUsername.value,
-                rPassword: rPassword.value,
-                rEmail: rEmail.value
-            }
-            // requesting Call
-            const resNewUser = await axios.post('https://my-portfolio-b9tc.onrender.com/api/user/register', pData)
-            alert(resNewUser.data.msg)
-            navigate('/login')
+        if (!rUsername || !rPassword || !rEmail) { //checking the data
+            alert('username, password and email are required for signing up!');            
+            return setLoading(false)
         }
-        setLoading(false)
+        if (rUsername.value.endsWith(' ') || rPassword.value.endsWith(' ') || rEmail.value.endsWith(' ')) {
+            setLoading(false)
+            alert('No space allowed at the end of the inputs!')
+            return;
+        }
+        const pData = { // pData = preparing data
+            rUsername: rUsername.value,
+            rPassword: rPassword.value,
+            rEmail: rEmail.value
+        }
+        // requesting Call
+        const resNewUser = await axios.post('https://my-portfolio-b9tc.onrender.com/api/user/register', {reqData:pData})
+        alert(resNewUser.data.msg)
+        navigate('/login')
     } catch (error) {
-        setLoading(false)
-        console.log('Error while creating New Account: ',error)
-        alert(error.response.data.msg)
+        alert('Error while creating New Account: ',error.response.data.msg)
     }
+    setLoading(false)
 }
 // login
 export const loginLogic = async(event, navigate, setIsLogIn, setUserName, setUserEmail, setLoading) => {
     event.preventDefault()
     setLoading(true)
-    try {
-        const lPassword = document.getElementById('lPassword')
-        const lEmail = document.getElementById('lEmail')
-    
-        if (lPassword && lEmail) { //checking the data
-            const pData = { // pData = preparing data
-                lPassword: lPassword.value,
-                lEmail: lEmail.value
-            }
-            // requesting Call
-            const lLogin = await axios.post('https://my-portfolio-b9tc.onrender.com/api/user/login', pData)
-            setLoading(false)
-            alert(lLogin.data.msg)
-            if (lLogin.data.passwordIs) {
-                setIsLogIn(true)
-                setUserName(lLogin.data.username)
-                setUserEmail(lLogin.data.email)
-                return navigate('/todo')
-            }
-        } else {
-            setLoading(false)
-            alert('Error while processing data. Please check your email and password.')
-        }
-    } catch (error) {
+    const lPassword = document.getElementById('lPassword')
+    const lEmail = document.getElementById('lEmail')
+
+    if (!lPassword || !lEmail) { //checking the data
         setLoading(false)
-        alert(error.response.data.msg)
+        return alert('Error while processing data. Please check your email and password.')
     }
+    const pData = { // pData = preparing data
+        lPassword: lPassword.value,
+        lEmail: lEmail.value
+    }
+    try {
+        // requesting Call
+        const lLogin = await axios.post('https://my-portfolio-b9tc.onrender.com/api/user/login', {reqData:pData})
+        
+        navigate('/todo')
+        alert(lLogin.data.msg)
+        setIsLogIn(true)
+        setUserName(lLogin.data.username)
+        setUserEmail(lLogin.data.email)
+    } catch (error) {
+        alert("error while logging in: ", error.response.data.msg)
+    }       
+    setLoading(false)
 }
 // Logout
 export const logoutLogic = (setIsLogIn, setUserName, setUserEmail) => {

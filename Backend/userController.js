@@ -1,199 +1,249 @@
-
-import { todoUsersData, users } from "./models/rUser.js";
 import bcrypt from "bcrypt"
+import db from "./firebase.js"
+import { FieldValue } from "firebase-admin/firestore"
 
-function getFullUrl(req) {
-    console.log(`${new Date} ${req.protocol}://${req.get('host')}${req.originalUrl}`)
-}
-
-// user 
+// summon all users 
 export const getAllUsers = async (req, res) => {
+    const { collection } = req.query
+    if (!collection) {
+        return res.status(400).json({msg: "Collection is Invalid!"})
+    }
     try {
-        getFullUrl(req);
-        
-        const getUser = await users.find(); // Use await to get the result
-        if (getUser) {
-            res.json(getUser); // Send the user data if found
-        } else {
-            res.status(404).json({msg:'User not found'}); // Handle case where user is not found
+        const getData = await db.collection(collection).get()
+        if (getData.empty) {
+            return res.status(404).json({msg: "Its quite in here!"})
         }
+        const store = []
+        getData.forEach( user=> {
+          const userData = user.data()
+          store.push(userData)
+        })
+        res.status(200).json({msg: "Here's the list, Sir!",store})
     } catch (error) {
-        res.status(500).json({msg:'Server Error'})
+        res.status(500).json({msg: "Something went wrong!"})
     }
 }
 // Sign Up
 export const newUser = async (req, res) => {
+    const { rUsername, rPassword, rEmail } = req.body.reqData
+    if (!rUsername || !rPassword || !rEmail) {
+        return res.status(400).json({msg: "Username, Password and Email are Required!"})
+    }
     try {
-        getFullUrl(req);
-        
-        const { rUsername, rPassword, rEmail } = req.body
-        if (rUsername && rPassword && rEmail) {
-            const normalizedUsername = rUsername.toLowerCase().replace(/\s/g, '')
-            const normalizedEmail = rEmail.toLowerCase();
-            const checkEmail = await users.findOne({email: normalizedEmail})
-            if (checkEmail) {
-                console.log('This email has already been used.')
-                return res.status(409).json({msg: "This email already has been used. Try new one.", email: normalizedEmail})
-            }
-            const passwordHash = await bcrypt.hash(rPassword,10)
-            const rData = {
-                username: normalizedUsername,
-                password: passwordHash,
-                email: normalizedEmail
-            }
-            await users.create(rData); // Create a new user
-            console.log('New user has been created.')
-            return res.status(201).json({msg: 'User has been registered successfully.'}) 
+        const normalizedEmail = rEmail.toLowerCase();
+        // const checkEmail = await users.findOne({email: normalizedEmail})
+        const docRef = db.collection('users').doc(rEmail)
+        const checkEmail = await docRef.get()
+        if (checkEmail.exists) {
+            return res.status(409).json({msg: "This email already has been used. Try new one.", email: normalizedEmail})
         }
-        return res.status(400).json({msg:'bad request... try again'})
+        const passwordHash = await bcrypt.hash(rPassword,10)
+        const rData = {
+            username: rUsername,
+            password: passwordHash,
+            email: normalizedEmail,
+            _TodoApp: [],
+            online: false
+        }
+
+        // await users.create(rData); // Create a new user
+        await db.collection('users').doc(rEmail).set(rData) // Create a new user
+        return res.status(201).json({msg: 'User has been registered successfully.', rData}) 
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error.'})
+        res.status(500).json({msg: "Something went wrong!"})
     }
 }
 // Sign In
 export const getUser = async (req, res) => {
+    const { lEmail, lPassword } = req.body.reqData
+    if ( !lEmail || !lPassword ) {
+        return res.status(400).json({msg: "Email and Password are Required!"})
+    }
     try {
-        getFullUrl(req); // logs Url when someone visits!
-
-        const { lEmail, lPassword } = req.body
-        const getUser = await users.findOne({email: lEmail})
-        if (!getUser) {
-            console.log("Didn't find any user with This Email...");
-            
-            return res.status(404).json({msg:"Didn't find any user with This Email..."})
+        // const getUser = await users.findOne({email: lEmail})
+        // const getUser = await users.findOne({email: lEmail})
+        const docRef = db.collection('users').doc(lEmail)
+        const getUser = await docRef.get()
+        if (!getUser.exists) {
+            return res.status(404).json({msg:"Account not found!"})
         }
-        const pHash = getUser.password
+        const userData = getUser.data() || 'no data'
+        const pHash = userData.password
         const passwordIs = await bcrypt.compare(lPassword, pHash)
-        if (passwordIs) {
-            console.log(`${getUser.username} Login successfully.`)
-            return res.json({ passwordIs, username: getUser.username, email: getUser.email, msg:'Login successfully.' })
-        } else {
-            console.log(`${getUser.username} is trying to Login with incorrect password.`)
+        if (!passwordIs) {
             return res.status(401).json({msg:"Wrong password"})
         }
+        await docRef.update({ online: true })
+        return res.json({ msg:`Welcome! ${userData.username}`, passwordIs, username: userData.username, email: userData.email, })
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'})
+        res.status(500).json({msg: "Something went wrong!"})
     }
 }
 // Rename
 export const changeName = async(req,res)=>{
+    const { userEmail, newName } = req.body.reqData
+    if ( !userEmail || !newName ) {
+        return res.status(400).json({msg: "New name and Email are Required!"})
+    }
     try {
-        getFullUrl(req);
-        
-        const { email, newUsername } = req.body
-
-        const updateUN = await users.findOneAndUpdate({email},{$set:{username: newUsername}},{new: true})
-        if (!updateUN) {
-            res.status(200).json({ msg: `Didn't find anyone with this email: `, nameChanged: false, updateUN })
-            return;
+        const docRef = db.collection('users').doc(userEmail)
+        const checkEmail = await docRef.get()
+        if (!checkEmail.exists) {
+            return res.status(404).json({msg:"Account not found!"})
         }
-        res.status(200).json({ msg: `Username Updated to: ${newUsername}.`, nameChanged: true }) 
+        await docRef.update({ username: newName})
+        res.status(200).json({ msg: `Username Changed to: ${newName}.`, nameChanged: true }) 
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'})
+        res.status(500).json({msg: "Something went wrong!"})
     }
 }
 
-// todo user Data
-
+// todo 
+// a task
 export const getUserTask = async (req,res)=>{
-    try {
-        getFullUrl(req);
-        
-        const getData = await todoUsersData.find(req.body)
-        // console.log(getData)
-        res.status(200).json({msg: 'Task', getData})
-    } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'}); // Handle server errors
+    const { userEmail, taskIndex } = req.body.reqData
+    if ( !userEmail || !taskIndex ) {
+        return res.status(400).json({msg: "Email and Index are Required!"})
     }
-}
-export const getUserAllTask = async (req,res)=>{
     try {
-        getFullUrl(req);
-        
-        console.log(req.query);
-            console.log(req.query, 'true');
-        const getData = await todoUsersData.find(req.query)
-        if (!getData.length) {
-            
-            res.status(200).json({msg: `There are no Task`})
-            // res.status(200).json({msg: `Didn't find anyone with this Email`})
-        } else {
-            res.status(200).json({msg: 'All Task are here: ', getData})
+        const docRef = db.collection('users').doc(userEmail)
+        const getTodoData = await docRef.get()
+        if (!getTodoData.exists) {
+            return res.status(404).json({msg:"Account not found!"})
         }
+        const _TodoTask = getTodoData.data()._TodoApp[taskIndex] || ["Task is undefined."]
+        res.status(200).json({msg: 'Task has been retrived', _TodoTask})
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg: "Something went wrong!"})
     }
 }
-export const createNewTask = async (req,res)=>{
+// gather all task
+export const getUserAllTask = async (req,res)=>{
+    const { userEmail } = req.body.reqData
+    if ( !userEmail ) {
+        return res.status(400).json({msg: "Email is Required!"})
+    }
     try {
-        getFullUrl(req);
-        
-        const { email, taskName, taskDate } = req.body
+        const docRef = db.collection('users').doc(userEmail)
+        const getTodoData = await docRef.get()
+        if (!getTodoData.exists) {
+            return res.status(404).json({msg:"Account not found!"})
+        }
+        const _TodoApp = getTodoData.data()._TodoApp || []
+        res.status(200).json({msg: 'Tasks has been retrived', _TodoApp})
+    } catch (error) {
+        res.status(500).json({msg: "Something went wrong!"})
+    }
+}
+// new Task
+export const createNewTask = async (req,res)=>{
+    const { userEmail, taskText, taskDate } = req.body.reqData
+    if ( !userEmail || !taskText || !taskDate ) {
+        return res.status(400).json({msg: "Email, Task text and Task date are Required!"})
+    }
+    try {
+        const docRef = db.collection('users').doc(userEmail)
+        const userData = await docRef.get()
+        if (!userData.exists) {
+            return res.status(404).json({msg:"Account not found!"})
+        }
+        const todoData = userData.data()._TodoApp
+        if (todoData.length >= 20) {
+            return res.status(409).json({msg:"Can't add more task, max limit exceeded!"})
+        } 
         const newData = {
-            email,
-            taskName,
+            taskText,
             isComplete: false,
             taskDate: taskDate
         }
-        const uploadData = await todoUsersData.create(newData)
-        res.status(201).json({msg: 'Task Created',uploadData})
+        await docRef.update({
+            _TodoApp: FieldValue.arrayUnion(newData)
+        })
+        res.status(201).json({msg: 'Task Created'})
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({msg: "Something went wrong!"})
     }
 }
+// is complete?
 export const updateTaskState =  async (req, res) => {
-    try {
-        getFullUrl(req);
-        
-        console.log('its uts')
-        const { email, taskDate, isComplete } = req.body
-        console.log(email, taskDate, isComplete);
-        
-        const updateData = await todoUsersData.updateOne(
-            { email: email, taskDate: taskDate },
-            { $set: { isComplete: !isComplete } },
-            { new: true }
-        )
-        console.log(updateData);
-
-        res.status(200).json({ msg: 'Task Updated', updateData })
-    } catch (error) {
-        console.error(error)  // Use `error` instead of `err`
-        res.status(500).json({ msg: 'Server Error', error: error.message })  // Use `error.message` instead of `err.message`
+    const { userEmail, taskDate, isComplete } = req.body.reqData;
+    if (!userEmail || !taskDate) { // Validate input
+        return res.status(400).json({ msg: "Email, Task date and Task state are Required!" });
     }
-}
-export const delUserTask = async (req,res)=>{
-    try {
-        getFullUrl(req);
-        
-        console.log(req.body);
-        const { email, taskDate } = req.body
-        
-        const delTask = await todoUsersData.deleteOne({email, taskDate})
-        
-        res.status(201).json({msg: `Task: ${req.body.taskDate} has been deleted`, delTask})
-    } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'}); // Handle server errors
+    if (isComplete === undefined) { // Validate input
+        return res.status(404).json({ msg: "Task not found!" });
     }
-}
-export const delUserAllTask = async (req,res)=>{
     try {
-        getFullUrl(req);
-        
-        const updateData = await todoUsersData.deleteMany(req.body)
-        if (updateData) {
-            console.log('All task has been Deleted ');
+        const docRef = db.collection('users').doc(userEmail);
+        const getTodoData = await docRef.get();
+        if (!getTodoData.exists) {// Checking Account
+            return res.status(404).json({ msg: "Account not found!" });
         }
-        res.status(201).json({msg: 'All task has been Deleted', updateData})
+        const _TodoTask = getTodoData.data()._TodoApp || []
+        if (_TodoTask.length < 0) {
+            return res.status(404).json({ msg: "No Task found to Update!" });
+        }
+        const _newTodoApp = _TodoTask.map( (e,i) => {
+            const data = {
+                taskText: e.taskText,
+                isComplete: e.isComplete,
+                taskDate: e.taskDate,
+            }
+            if (taskDate === e.taskDate) {
+                data.isComplete = !isComplete
+            }
+            return data
+        })
+        await docRef.update({ // Update task
+            _TodoApp: _newTodoApp
+        })
+        res.status(200).json({ msg: 'Task has been updated', _TodoTask });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({msg:'Server Error'}); // Handle server errors
+        res.status(500).json({ msg: "Something went wrong!" });
+    }
+}
+// Delete task
+export const delUserTask = async (req,res)=>{
+    const { userEmail, taskDate } = req.body.reqData;
+    if (!userEmail || !taskDate) { // Validate input
+        return res.status(400).json({ msg: "Email and a valid Index are Required!" });
+    }
+    try {
+        const docRef = db.collection('users').doc(userEmail);
+        const userData = await docRef.get();
+        if (!userData.exists) {// Checking Account
+            return res.status(404).json({ msg: "Account not found!" });
+        }
+        const _TodoTask = userData.data()._TodoApp || []
+        if (_TodoTask.length < 0) {
+            return res.status(404).json({ msg: "No Task found to Update!" });
+        }
+        const _newTodoApp = _TodoTask.filter( (e,i) => e.taskDate !== taskDate)
+        await docRef.update({ // Delete task
+            _TodoApp: _newTodoApp
+        })
+        res.status(200).json({ msg: 'Task has been Deleted' });
+    } catch (error) {
+        res.status(500).json({ msg: "Something went wrong!" });
+    }
+}
+// Almighty Delete!!!
+export const delUserAllTask = async (req,res)=>{
+    const { userEmail } = req.body.reqData
+    if (!userEmail ) { // Validate input
+        return res.status(400).json({ msg: "Email is Required!" });
+    }
+    try {
+        const docRef = db.collection('users').doc(userEmail);
+        const userData = await docRef.get();
+        if (!userData.exists) {// Checking Account
+            return res.status(404).json({ msg: "Account not found!" });
+        }
+        await docRef.update({// Almighty Delete!!!
+            _TodoApp: []
+        })
+        res.status(200).json({ msg: 'This World shall Know Pain, Almighty Delete!!!' });
+    } catch (error) {
+        res.status(500).json({ msg: "Something went wrong!" });
     }
 }
